@@ -1,5 +1,7 @@
 package com.skillsync.dto;
 
+import com.skillsync.entity.FollowInfo;
+import com.skillsync.entity.LearningPlan;
 import lombok.Data;
 
 import java.util.List;
@@ -10,6 +12,7 @@ public class UserDTO {
     private String email;
     private String name;
     private String password;
-    private List<String> followers;
-    private List<String> following;
+    private List<FollowInfo> followers;
+    private List<FollowInfo> following;
+    private List<LearningPlan> learningPlans;
 }

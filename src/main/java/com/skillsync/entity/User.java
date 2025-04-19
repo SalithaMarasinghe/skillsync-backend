@@ -13,21 +13,18 @@ import java.util.Collection;
 import java.util.List;
 
 @Data
-@Document(collection = "users")
+@Document(collection = "user")
 public class User implements UserDetails {
 
-    @Id
     private String id;
     @NotBlank(message = "Email is required")
     private String email;
     private String name;
     private String password;
 
-    @DBRef
-    private List<LearningPlan> learningPlans = new ArrayList<>();
-
-    private List<String> followers = new ArrayList<>();
-    private List<String> following = new ArrayList<>();
+    private List<FollowInfo> followers = new ArrayList<>();
+    private List<FollowInfo> following = new ArrayList<>();
+    private List<String> learningPlanIds = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -68,7 +65,7 @@ public class User implements UserDetails {
                 ", password='" + password + '\'' +
                 ", followers=" + followers +
                 ", following=" + following +
-                ", learningPlans=" + learningPlans +
+                ", learningPlanIds=" + learningPlanIds +
                 '}';
     }
 }
