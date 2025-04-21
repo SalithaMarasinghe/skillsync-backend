@@ -2,8 +2,6 @@ package com.skillsync.entity;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +19,8 @@ public class User implements UserDetails {
     private String email;
     private String name;
     private String password;
+    private String bio;
+    private String photo;
 
     private List<FollowInfo> followers = new ArrayList<>();
     private List<FollowInfo> following = new ArrayList<>();
@@ -63,6 +63,8 @@ public class User implements UserDetails {
                 ", email='" + email + '\'' +
                 ", name='" + name + '\'' +
                 ", password='" + password + '\'' +
+                ", bio='" + bio + '\'' +
+                ", photo='" + photo + '\'' +
                 ", followers=" + followers +
                 ", following=" + following +
                 ", learningPlanIds=" + learningPlanIds +
