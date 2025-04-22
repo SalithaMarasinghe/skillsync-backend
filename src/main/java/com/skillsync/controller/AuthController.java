@@ -11,10 +11,13 @@ import com.skillsync.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.util.StringUtils;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -95,5 +98,30 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+    }
+
+    // --- Google OAuth2 Success Handler ---
+    @GetMapping("/oauth2/success")
+    public void oauth2Success(
+            @AuthenticationPrincipal OidcUser oidcUser,
+            HttpServletResponse response
+    ) throws java.io.IOException {
+        if (oidcUser == null) {
+            response.sendRedirect("http://localhost:3000/login?error=oauth");
+            return;
+        }
+        String email = oidcUser.getEmail();
+        String name = oidcUser.getFullName();
+        // Check if user exists, else create
+        User user = userRepository.findByEmail(email).orElseGet(() -> {
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setName(name);
+            // No password for OAuth users
+            return userRepository.save(newUser);
+        });
+        String token = jwtService.generateToken(user.getEmail());
+        // Redirect to frontend with token as query param
+        response.sendRedirect("http://localhost:3000/?token=" + token);
     }
 }

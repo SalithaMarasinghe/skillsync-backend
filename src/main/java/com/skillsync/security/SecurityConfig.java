@@ -20,7 +20,10 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable());
+            .csrf(csrf -> csrf.disable())
+            .oauth2Login(oauth2 -> oauth2
+                .defaultSuccessUrl("/api/auth/oauth2/success", true)
+            );
         return http.build();
     }
 
