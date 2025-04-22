@@ -17,6 +17,7 @@ public class LearningPlan {
     private String description;
     private List<String> topics;
     private List<String> resources;
+    private String userId;
 
     @Override
     public String toString() {
@@ -26,6 +27,7 @@ public class LearningPlan {
                 ", description='" + description + '\'' +
                 ", topics=" + topics +
                 ", resources=" + resources +
+                ", userId='" + userId + '\'' +
                 '}';
     }
 }

@@ -2,29 +2,48 @@ package com.skillsync.controller;
 
 import com.skillsync.dto.LearningPlanDTO;
 import com.skillsync.entity.LearningPlan;
+import com.skillsync.entity.User;
+import com.skillsync.repo.UserRepository;
+import com.skillsync.security.JwtService;
 import com.skillsync.service.LearningPlanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/learningplans")
 public class LearningPlanController {
     private final LearningPlanService learningPlanService;
+    private final JwtService jwtService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public LearningPlanController(LearningPlanService learningPlanService) {
+    public LearningPlanController(LearningPlanService learningPlanService, JwtService jwtService, UserRepository userRepository) {
         this.learningPlanService = learningPlanService;
+        this.jwtService = jwtService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping
-    public ResponseEntity<LearningPlan> createLearningPlan(@RequestBody LearningPlanDTO learningPlanDTO) {
+    public ResponseEntity<LearningPlan> createLearningPlan(@RequestHeader("Authorization") String authHeader, @RequestBody LearningPlanDTO learningPlanDTO) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String token = authHeader.substring(7);
+        String email = jwtService.extractUsername(token);
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
         LearningPlan learningPlan = new LearningPlan();
         learningPlan.setName(learningPlanDTO.getName());
         learningPlan.setDescription(learningPlanDTO.getDescription());
         learningPlan.setTopics(learningPlanDTO.getTopics());
         learningPlan.setResources(learningPlanDTO.getResources());
+        learningPlan.setUserId(user.getId());
 
         LearningPlan created = learningPlanService.createLearningPlan(learningPlan);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
@@ -51,8 +70,24 @@ public class LearningPlanController {
     }
 
     @GetMapping
-    public ResponseEntity<java.util.List<LearningPlan>> getAllLearningPlans() {
+    public ResponseEntity<List<LearningPlan>> getAllLearningPlans() {
         return ResponseEntity.ok(learningPlanService.getAllLearningPlans());
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<LearningPlan>> getMyLearningPlans(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String token = authHeader.substring(7);
+        String email = jwtService.extractUsername(token);
+        // Find user by email
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        List<LearningPlan> plans = learningPlanService.getLearningPlansByUserId(user.getId());
+        return ResponseEntity.ok(plans);
     }
 
     @PutMapping("/{id}")
