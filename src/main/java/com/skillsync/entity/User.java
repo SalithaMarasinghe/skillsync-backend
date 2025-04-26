@@ -70,4 +70,16 @@ public class User implements UserDetails {
                 ", learningPlanIds=" + learningPlanIds +
                 '}';
     }
+
+    // Add this to your existing User class
+    private List<String> learningProgressIds = new ArrayList<>();
+
+    // Add getter and setter (if not using @Data)
+    public List<String> getLearningProgressIds() {
+        return learningProgressIds;
+    }
+
+    public void setLearningProgressIds(List<String> learningProgressIds) {
+        this.learningProgressIds = learningProgressIds;
+    }
 }
