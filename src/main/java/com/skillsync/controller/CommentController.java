@@ -14,10 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@RestController   //Marks this as a controller that returns data directly (not views)
+@RestController   //Marks this as a controller that returns JSON (not views)
 @RequestMapping("/api/comments")   //Base path for all endpoints in this controller
 public class CommentController {
 
+    //Dependencies
     @Autowired
     private CommentService commentService;  //Handles business logic for comments
 
@@ -71,14 +72,14 @@ public class CommentController {
         return ResponseEntity.noContent().build();
     }
 
-    //Helper Methods
+    //Helper Method
     private String getUserIdFromAuthHeader(String authHeader) {  //Extracts user ID from JWT token in Authorization header
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new RuntimeException("Invalid authorization header");
         }
-        String token = authHeader.substring(7);
+        String token = authHeader.substring(7);  //Extracts the JWT token from the header
         String email = jwtService.extractUsername(token);   //Extracts email from token
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmail(email) //Finds the user in the database by using this and returns the user Id
                 .orElseThrow(() -> new RuntimeException("User not found"))
                 .getId();
     }
