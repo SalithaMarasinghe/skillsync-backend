@@ -113,19 +113,7 @@ public class PostService {
         return post;
     }
 
-    public Post addComment(String postId, String userId, String commentContent) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Post not found with id: " + postId));
-        
-        Post.Comment comment = new Post.Comment();
-        comment.setUserId(userId);
-        comment.setContent(commentContent);
-        comment.setCreatedAt(LocalDateTime.now());
-        
-        post.getComments().add(comment);
-        return postRepository.save(post);
-    }
-
+    
     public PostDTO convertToDTO(Post post) {
         PostDTO dto = new PostDTO();
         dto.setId(post.getId());
