@@ -39,13 +39,18 @@ public class LearningProgressController {
 
     @GetMapping
     public ResponseEntity<List<LearningProgress>> getAllLearningProgressByUser(
-            @RequestHeader("Authorization") String authHeader) {
-        String userId = getUserIdFromToken(authHeader);
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        try {
+            String userId = getUserIdFromToken(authHeader);
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            List<LearningProgress> progressList = learningProgressService.getAllLearningProgressByUser(userId);
+            return ResponseEntity.ok(progressList);
+        } catch (Exception e) {
+            e.printStackTrace(); // Log to console, or use a logger
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        List<LearningProgress> progressList = learningProgressService.getAllLearningProgressByUser(userId);
-        return ResponseEntity.ok(progressList);
     }
 
     @GetMapping("/{id}")
@@ -79,10 +84,15 @@ public class LearningProgressController {
     }
 
     private String getUserIdFromToken(String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return null;
+            }
+            String token = authHeader.substring(7);
+            return jwtService.extractUsername(token);
+        } catch (Exception e) {
+            e.printStackTrace(); // Log to console, or use a logger
             return null;
         }
-        String token = authHeader.substring(7);
-        return jwtService.extractUsername(token);
     }
 }
