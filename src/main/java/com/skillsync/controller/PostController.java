@@ -131,16 +131,7 @@ public class PostController {
         return ResponseEntity.ok(postService.convertToDTO(post));
     }
 
-    @PostMapping("/{postId}/comment")
-    public ResponseEntity<PostDTO> addComment(
-            @RequestHeader("Authorization") String authHeader,
-            @PathVariable String postId,
-            @RequestParam String content) {
-        
-        String userId = getUserIdFromAuthHeader(authHeader);
-        Post post = postService.addComment(postId, userId, content);
-        return ResponseEntity.ok(postService.convertToDTO(post));
-    }
+    
 
    @GetMapping("/media/{fileId}")
     public ResponseEntity<byte[]> getMedia(@PathVariable String fileId) {
