@@ -10,6 +10,7 @@ import java.util.List;
 public class PostDTO {
     private String id;
     private String userId;
+    private String userName;
     private String content;
     private List<String> imageUrls;
     private String videoUrl;

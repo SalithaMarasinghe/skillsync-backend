@@ -34,6 +34,7 @@ public class PostService {
         Post post = new Post();
         post.setUserId(userId);
         post.setContent(content);
+        post.setCreatedAt(LocalDateTime.now());
         
         if (images != null && !images.isEmpty()) {
             if (images.size() > 3) {
@@ -69,6 +70,7 @@ public class PostService {
         return postRepository.findById(id)
                 .map(post -> {
                     post.setContent(content);
+                    post.setCreatedAt(LocalDateTime.now());
                     return postRepository.save(post);
                 })
                 .orElseThrow(() -> new PostNotFoundException("Post not found with id: " + id));
@@ -124,6 +126,9 @@ public class PostService {
         dto.setComments(post.getComments());
         dto.setCreatedAt(post.getCreatedAt());
         
+        userRepository.findById(post.getUserId()).ifPresent(user -> {
+            dto.setUserName(user.getName());
+        });
         // Generate URLs for images and video
         if (post.getImageIds() != null && !post.getImageIds().isEmpty()) {
             dto.setImageUrls(post.getImageIds().stream()
